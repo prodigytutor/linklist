@@ -10,28 +10,36 @@ import {useState} from "react";
 import toast from "react-hot-toast";
 import {ReactSortable} from "react-sortablejs";
 
-export default function PageLinksForm({page,user}) {
-  const [links,setLinks] = useState(page.links || []);
+export default function PageLinksForm({page = {links: []}, user}) {
+  const [links, setLinks] = useState(page.links || []);
+
   async function save() {
-    await savePageLinks(links);
-    toast.success('Saved!');
+    try {
+      await savePageLinks(links);
+      toast.success('Saved!');
+    } catch (error) {
+      toast.error('Failed to save links.');
+      console.error('Error saving links:', error);
+    }
   }
+
   function addNewLink() {
     setLinks(prev => {
       return [...prev, {
         key: Date.now().toString(),
-        title:'',
-        subtitle:'',
-        icon:'',
-        url:'',
+        title: '',
+        subtitle: '',
+        icon: '',
+        url: '',
       }];
     });
   }
+
   function handleUpload(ev, linkKeyForUpload) {
     upload(ev, uploadedImageUrl => {
       setLinks(prevLinks => {
         const newLinks = [...prevLinks];
-        newLinks.forEach((link,index) => {
+        newLinks.forEach((link, index) => {
           if (link.key === linkKeyForUpload) {
             link.icon = uploadedImageUrl;
           }
@@ -40,6 +48,7 @@ export default function PageLinksForm({page,user}) {
       });
     });
   }
+
   function handleLinkChange(keyOfLinkToChange, prop, ev) {
     setLinks(prev => {
       const newLinks = [...prev];
@@ -48,14 +57,16 @@ export default function PageLinksForm({page,user}) {
           link[prop] = ev.target.value;
         }
       });
-      return [...prev];
-    })
+      return newLinks;
+    });
   }
+
   function removeLink(linkKeyToRemove) {
     setLinks(prevLinks =>
       [...prevLinks].filter(l => l.key !== linkKeyToRemove)
     );
   }
+
   return (
     <SectionBox>
       <form action={save}>
@@ -93,11 +104,11 @@ export default function PageLinksForm({page,user}) {
                   </div>
                   <div>
                     <input
-                      onChange={ev => handleUpload(ev,l.key)}
-                      id={'icon'+l.key}
+                      onChange={ev => handleUpload(ev, l.key)}
+                      id={'icon' + l.key}
                       type="file"
-                      className="hidden"/>
-                    <label htmlFor={'icon'+l.key} className="border mt-2 p-2 flex items-center gap-1 text-gray-600 cursor-pointer mb-2 justify-center">
+                      className="hidden" />
+                    <label htmlFor={'icon' + l.key} className="border mt-2 p-2 flex items-center gap-1 text-gray-600 cursor-pointer mb-2 justify-center">
                       <FontAwesomeIcon icon={faCloudArrowUp} />
                       <span>Change icon</span>
                     </label>
@@ -114,17 +125,17 @@ export default function PageLinksForm({page,user}) {
                   <input
                     value={l.title}
                     onChange={ev => handleLinkChange(l.key, 'title', ev)}
-                    type="text" placeholder="title"/>
+                    type="text" placeholder="title" />
                   <label className="input-label">Subtitle:</label>
                   <input
                     value={l.subtitle}
                     onChange={ev => handleLinkChange(l.key, 'subtitle', ev)}
-                    type="text" placeholder="subtitle (optional)"/>
+                    type="text" placeholder="subtitle (optional)" />
                   <label className="input-label">URL:</label>
                   <input
                     value={l.url}
                     onChange={ev => handleLinkChange(l.key, 'url', ev)}
-                    type="text" placeholder="url"/>
+                    type="text" placeholder="url" />
                 </div>
               </div>
             ))}

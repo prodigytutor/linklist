@@ -12,6 +12,7 @@ export default function HeroForm({user}) {
       && window.localStorage.getItem('desiredUsername')
     ) {
       const username = window.localStorage.getItem('desiredUsername');
+      console.log('username', username);
       window.localStorage.removeItem('desiredUsername');
       redirect('/account?desiredUsername=' + username);
     }
@@ -20,7 +21,9 @@ export default function HeroForm({user}) {
     ev.preventDefault();
     const form = ev.target;
     const input = form.querySelector('input');
+    console.log('input', input);
     const username = input.value;
+    console.log('username', username);
     if (username.length > 0) {
       if (user) {
         router.push('/account?desiredUsername='+username);
@@ -35,7 +38,7 @@ export default function HeroForm({user}) {
       onSubmit={handleSubmit}
       className="inline-flex items-center shadow-lg bg-white shadow-gray-500/20">
           <span className="bg-white py-4 pl-4">
-            linklist.to/
+          whoami.click/
           </span>
       <input
         type="text"

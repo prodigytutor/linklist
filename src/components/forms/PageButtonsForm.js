@@ -34,9 +34,9 @@ function upperFirst(str) {
   return str.slice(0,1).toUpperCase() + str.slice(1);
 }
 
-export default function PageButtonsForm({user,page}) {
+export default function PageButtonsForm({user = {}, page = {}}) {
 
-  const pageSavedButtonsKeys = Object.keys(page.buttons);
+  const pageSavedButtonsKeys = Object.keys(page.buttons || {});
   const pageSavedButtonsInfo = pageSavedButtonsKeys
     .map(k => allButtons.find(b => b.key === k));
   const [activeButtons, setActiveButtons] = useState(pageSavedButtonsInfo);
@@ -48,8 +48,12 @@ export default function PageButtonsForm({user,page}) {
   }
 
   async function saveButtons(formData) {
-    await savePageButtons(formData);
-    toast.success('Settings saved!');
+    try {
+      await savePageButtons(formData);
+      toast.success('Settings saved!');
+    } catch (error) {
+      toast.error('Failed to save settings. Please try again.');
+    }
   }
 
   function removeButton({key:keyToRemove}) {
@@ -82,7 +86,7 @@ export default function PageButtonsForm({user,page}) {
                 <input
                   placeholder={b.placeholder}
                   name={b.key}
-                  defaultValue={page.buttons[b.key]}
+                  defaultValue={page.buttons ? page.buttons[b.key] : ''}
                   type="text" style={{marginBottom:'0'}} />
                 <button
                   onClick={() => removeButton(b)}
